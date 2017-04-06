@@ -1,29 +1,7 @@
-# README #
+Flask Boilerplate
+====
 
-This README would normally document whatever steps are necessary to get your application up and running.
+A starting point for small, proof of concept flask projects using HTML5 Boilerplate and Bootstrap 4.
 
-### What is this repository for? ###
-
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
-
-### How do I get set up? ###
-
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
-* Repo owner or admin
-* Other community or team contact
+Created by modifying the output from [initializr](http://www.initializr.com/) for a flask project.  
+The icons were generated using [real favicon generator](http://realfavicongenerator.net/).
