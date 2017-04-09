@@ -43,10 +43,58 @@
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
 
+        <div id="fb-root"></div>
+        <script>
+
+          window.fbAsyncInit = function() {
+            FB.init({
+              appId      : '{{ app_id }}',
+              xfbml      : true,
+              version    : 'v2.8',
+              cookie     : true
+            });
+            FB.AppEvents.logPageView();
+            FB.Event.subscribe('auth.login', function(response) {
+                window.location = window.location;
+            });
+          };
+
+          (function(d, s, id){
+             var js, fjs = d.getElementsByTagName(s)[0];
+             if (d.getElementById(id)) {return;}
+             js = d.createElement(s); js.id = id;
+             js.src = "//connect.facebook.net/en_US/sdk.js";
+             fjs.parentNode.insertBefore(js, fjs);
+           }(document, 'script', 'facebook-jssdk'));
+
+            <!--function checkLoginState() {-->
+              <!--FB.getLoginStatus(function(response) {-->
+                  <!--console.log('status: ' + response.status);-->
+                  <!--if (response.status === 'connected') {-->
+                    <!--console.log('accessToken: ' + response.authResponse.accessToken);-->
+                    <!--console.log('userID: ' + response.authResponse.userID);-->
+                    <!--console.log('response.authResponse: ' + response.authResponse);-->
+                    <!--statusChangeCallback(response);-->
+              <!--}-->
+
+              <!--});-->
+
+                <!--}-->
+
+                              <!--console.log('window.location.pathname: ' + window.location.pathname);-->
+
+              <!--&lt;!&ndash;window.location.pathname='/ASD'&ndash;&gt;-->
+
+</script>
+
+
+
+
         <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
           <div class="container">
             <div class="navbar-header">
               <a class="navbar-brand" href="#">Project name</a>
+                <div class="fb-login-button" data-max-rows="1" data-size="medium" data-show-faces="false" data-auto-logout-link="true" onlogin="checkLoginState();"></div>
             </div>
           </div>
         </nav>
