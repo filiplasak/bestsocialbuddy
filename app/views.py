@@ -60,12 +60,13 @@ def get_current_user():
         if not user:
             # Not an existing user so get info
             graph = GraphAPI(result['access_token'])
-            profile = graph.get_object('me')
+            profile = graph.get_object(id='me', fields='id,name,email,link')
             if 'link' not in profile:
                 profile['link'] = ""
 
             # Create the user and insert it into the database
             user = User(id=str(profile['id']), name=profile['name'],
+                        email=profile['email'],
                         profile_url=profile['link'],
                         access_token=result['access_token'])
             db.session.add(user)

@@ -11,6 +11,7 @@ class User(db.Model):
                         onupdate=datetime.utcnow)
     name = db.Column(db.String, nullable=False)
     profile_url = db.Column(db.String, nullable=False)
+    email = db.Column(db.String, nullable=False)
     access_token = db.Column(db.String, nullable=False)
 
     def __repr__(self):
