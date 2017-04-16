@@ -1,5 +1,5 @@
 from facebook import get_user_from_cookie, GraphAPI
-from flask import g, render_template, redirect, request, session, url_for
+from flask import g, render_template, redirect, request, session, url_for, make_response
 
 from app import app, db
 from .models import User
@@ -27,8 +27,26 @@ def logout():
     session.  Note: this does not log the user out of Facebook - this is done
     by the JavaScript SDK.
     """
+    # app.logger.debug('Inside logout route')
     session.pop('user', None)
+    # session.clear()
+    # resp = make_response(redirect(url_for('index')))
+    # resp.set_cookie('session', expires=0)
+    # return resp
     return redirect(url_for('index'))
+
+
+@app.route('/dashboard')
+def dashboard():
+    """Dashboard
+    """
+    graph = GraphAPI(g.user['access_token'])
+    profile = graph.get_object('me/groups')
+    groups = graph.get_connections(id='me', connection_name='groups')
+    print('profile: ' + str(profile))
+    print('groups: ' + str(groups))
+
+    return render_template('dashboard.html', user=g.user, app_id=FB_APP_ID)
 
 
 @app.before_request
@@ -45,6 +63,7 @@ def get_current_user():
     # Set the user in the session dictionary as a global g.user and bail out
     # of this function early.
     if session.get('user'):
+        app.logger.debug('session.get(\'user\') returns true')
         g.user = session.get('user')
         return
 
@@ -54,6 +73,7 @@ def get_current_user():
 
     # If there is no result, we assume the user is not logged in.
     if result:
+        app.logger.debug('get_user_from_cookie returns true')
         # Check to see if this user is already in our database.
         user = User.query.filter(User.id == result['uid']).first()
 
@@ -63,6 +83,9 @@ def get_current_user():
             profile = graph.get_object(id='me', fields='id,name,email,link')
             if 'link' not in profile:
                 profile['link'] = ""
+
+            if 'email' not in profile:
+                profile['email'] = ""
 
             # Create the user and insert it into the database
             user = User(id=str(profile['id']), name=profile['name'],

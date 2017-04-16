@@ -31,7 +31,6 @@
                 padding-bottom: 20px;
             }
         </style>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/bootstrap-theme.min.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
 
         <!--Scripts-->
@@ -42,20 +41,53 @@
         <!--[if lt IE 8]>
             <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
         <![endif]-->
-
         <div id="fb-root"></div>
+
         <script>
+
+          function statusChangeCallback(response) {
+            console.log('statusChangeCallback');
+            console.log(response);
+            if (response.status === 'connected') {
+              // Logged into your app and Facebook.
+              console.log('Logged in');
+            } else {
+              console.log('Logged out');
+            }
+          }
+
+          function checkLoginState() {
+            FB.getLoginStatus(function(response) {
+              statusChangeCallback(response);
+            });
+          }
+
+          function fbButtonClicked() {
+            console.log('fbButtonClicked');
+            FB.getLoginStatus(function(response) {
+                statusChangeCallback(response);
+                if (response.status === 'connected') {
+                  // Logged into your app and Facebook.
+                  console.log('fbButtonClicked - Logged in');
+                  window.location.reload();
+                } else {
+                  console.log('fbButtonClicked - /logout path');
+                  window.location.pathname='/logout';
+                }
+            });
+
+          }
 
           window.fbAsyncInit = function() {
             FB.init({
-              appId      : '{{ app_id }}',
+              appId      : {{ app_id }},
+              cookie     : true,
               xfbml      : true,
-              version    : 'v2.8',
-              cookie     : true
+              version    : 'v2.8'
             });
             FB.AppEvents.logPageView();
-            FB.Event.subscribe('auth.login', function(response) {
-                window.location = window.location;
+            FB.getLoginStatus(function(response) {
+                statusChangeCallback(response);
             });
           };
 
@@ -67,34 +99,14 @@
              fjs.parentNode.insertBefore(js, fjs);
            }(document, 'script', 'facebook-jssdk'));
 
-            <!--function checkLoginState() {-->
-              <!--FB.getLoginStatus(function(response) {-->
-                  <!--console.log('status: ' + response.status);-->
-                  <!--if (response.status === 'connected') {-->
-                    <!--console.log('accessToken: ' + response.authResponse.accessToken);-->
-                    <!--console.log('userID: ' + response.authResponse.userID);-->
-                    <!--console.log('response.authResponse: ' + response.authResponse);-->
-                    <!--statusChangeCallback(response);-->
-              <!--}-->
-
-              <!--});-->
-
-                <!--}-->
-
-                              <!--console.log('window.location.pathname: ' + window.location.pathname);-->
-
-              <!--&lt;!&ndash;window.location.pathname='/ASD'&ndash;&gt;-->
-
-</script>
-
-
-
+        </script>
 
         <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
           <div class="container">
             <div class="navbar-header">
               <a class="navbar-brand" href="#">Project name</a>
-                <div class="fb-login-button" data-max-rows="1" data-size="medium" data-show-faces="false" data-auto-logout-link="true" onlogin="checkLoginState();"></div>
+                <div class="fb-login-button" id="fb-login-button" data-max-rows="1" data-size="medium" data-show-faces="false" data-auto-logout-link="true" scope="user_managed_groups" onlogin="fbButtonClicked();"></div>
+                <div id="status"></div>
             </div>
           </div>
         </nav>
@@ -111,6 +123,7 @@
         <script src="//ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
         <script>window.jQuery || document.write('<script src="{{ url_for('static', filename='js/vendor/jquery-3.1.0.min.js') }}"><\/script>')</script>
 
+        <script src="https://npmcdn.com/tether@1.2.4/dist/js/tether.min.js"></script>
         <script src="{{ url_for('static', filename='js/vendor/bootstrap.min.js') }}"></script>
 
         <script src="{{ url_for('static', filename='js/main.js') }}"></script>
