@@ -1,7 +1,8 @@
-from facebook import get_user_from_cookie, GraphAPI
-from flask import g, render_template, redirect, request, session, url_for, make_response
+from facebook import get_user_from_cookie, GraphAPI, GraphAPIError
+from flask import g, render_template, redirect, request, session, url_for
+from flask_login import login_user, logout_user, login_required
 
-from app import app, db
+from app import app, db, login_manager
 from .models import User
 
 FB_APP_ID = app.config['FB_APP_ID']
@@ -21,27 +22,29 @@ def index():
 
 
 @app.route('/logout')
+@login_required
 def logout():
     """Log out the user from the application.
     Log out the user from the application by removing them from the
     session.  Note: this does not log the user out of Facebook - this is done
     by the JavaScript SDK.
     """
-    # app.logger.debug('Inside logout route')
     session.pop('user', None)
-    # session.clear()
-    # resp = make_response(redirect(url_for('index')))
-    # resp.set_cookie('session', expires=0)
-    # return resp
+    logout_user()
     return redirect(url_for('index'))
 
 
 @app.route('/dashboard')
+@login_required
 def dashboard():
     """Dashboard
     """
     graph = GraphAPI(g.user['access_token'])
-    profile = graph.get_object('me/groups')
+    try:
+        profile = graph.get_object('me/groups')
+    except GraphAPIError as error:
+        print("Error: " + error.message)
+        return redirect(url_for('logout'))
     groups = graph.get_connections(id='me', connection_name='groups')
     print('profile: ' + str(profile))
     print('groups: ' + str(groups))
@@ -101,6 +104,15 @@ def get_current_user():
         session['user'] = dict(name=user.name, profile_url=user.profile_url,
                                id=user.id, access_token=user.access_token)
 
+        # Log in user using flask-login
+        app.logger.debug('Logging in user: ' + user.name)
+        login_user(user)
+
     # Commit changes to the database and set the user as a global g.user
     db.session.commit()
     g.user = session.get('user', None)
+
+
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(user_id)

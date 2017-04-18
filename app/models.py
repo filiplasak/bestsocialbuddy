@@ -1,9 +1,9 @@
 from datetime import datetime
-
 from app import db
+from flask_login import UserMixin
 
 
-class User(db.Model):
+class User(db.Model, UserMixin):
 
     id = db.Column(db.String, nullable=False, primary_key=True)
     created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
@@ -15,4 +15,7 @@ class User(db.Model):
     access_token = db.Column(db.String, nullable=False)
 
     def __repr__(self):
+        return '<User %r>' % self.name
+
+    def __str__(self):
         return '<User %r>' % self.name
