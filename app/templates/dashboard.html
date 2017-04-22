@@ -2,7 +2,12 @@
 {% block body %}
 <div class="container">
   <div class="row">
-asd
+    Groups:
+    <ul>
+    {% for group in groups %}
+      <li>{{ group['name'] }} (activities: {{ group['feed']['data']|length }}, members: {{ group['members']['data']|length }})
+    {% endfor %}
+    </ul>
   </div>
   <hr>
 </div>

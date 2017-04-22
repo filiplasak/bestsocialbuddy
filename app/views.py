@@ -41,15 +41,14 @@ def dashboard():
     """
     graph = GraphAPI(g.user['access_token'])
     try:
-        profile = graph.get_object('me/groups')
+        groups = graph.get_object(id='me/groups', fields='name,id,members,feed')
     except GraphAPIError as error:
         print("Error: " + error.message)
         return redirect(url_for('logout'))
-    groups = graph.get_connections(id='me', connection_name='groups')
-    print('profile: ' + str(profile))
+    # groups = graph.get_connections(id='me', connection_name='groups')
     print('groups: ' + str(groups))
 
-    return render_template('dashboard.html', user=g.user, app_id=FB_APP_ID)
+    return render_template('dashboard.html', user=g.user, app_id=FB_APP_ID, groups=groups['data'])
 
 
 @app.before_request
