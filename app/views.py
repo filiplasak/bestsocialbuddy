@@ -52,9 +52,30 @@ def dashboard():
     return render_template('dashboard.html', user=g.user, app_id=FB_APP_ID, groups=groups['data'])
 
 
+@app.route('/dashboard/add_entry', methods=['GET', 'POST'])
+@login_required
+def add_entry():
+    """Add entry
+    """
+    if request.method == 'GET':
+        graph = GraphAPI(g.user['access_token'])
+        try:
+            groups = graph.get_object(id='me/groups', fields='name,id,members,feed')
+        except GraphAPIError as error:
+            print("Error: " + error.message)
+            return redirect(url_for('logout'))
+        # groups = graph.get_connections(id='me', connection_name='groups')
+        print('groups: ' + str(groups))
+
+        return render_template('add_entry.html', user=g.user, app_id=FB_APP_ID, groups=groups['data'])
+    else:
+        return
+
+
 @app.route('/about')
 def about():
     return render_template('about.html')
+
 
 @app.before_request
 def get_current_user():
