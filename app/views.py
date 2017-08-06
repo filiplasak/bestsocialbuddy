@@ -44,12 +44,12 @@ def dashboard():
     try:
         groups = graph.get_object(id='me/groups', fields='name,id,members,feed')
     except GraphAPIError as error:
-        print("Error: " + error.message)
+        app.logger.error("Error: " + error.message)
         return redirect(url_for('logout'))
     # groups = graph.get_connections(id='me', connection_name='groups')
-    print('groups: ' + str(groups))
+    app.logger.debug('groups: ' + str(groups))
 
-    return render_template('dashboard.html', user=g.user, app_id=FB_APP_ID, groups=groups['data'])
+    return render_template('dashboard.html', user=g.user, app_id=FB_APP_ID, name=FB_APP_NAME, groups=groups['data'])
 
 
 @app.route('/dashboard/add_entry', methods=['GET', 'POST'])
@@ -57,24 +57,33 @@ def dashboard():
 def add_entry():
     """Add entry
     """
+    graph = GraphAPI(g.user['access_token'])
     if request.method == 'GET':
-        graph = GraphAPI(g.user['access_token'])
         try:
             groups = graph.get_object(id='me/groups', fields='name,id,members,feed')
         except GraphAPIError as error:
-            print("Error: " + error.message)
+            app.logger.error("Error: " + error.message)
             return redirect(url_for('logout'))
-        # groups = graph.get_connections(id='me', connection_name='groups')
-        print('groups: ' + str(groups))
+        app.logger.debug('groups: ' + str(groups))
 
-        return render_template('add_entry.html', user=g.user, app_id=FB_APP_ID, groups=groups['data'])
+        return render_template('add_entry.html', user=g.user, app_id=FB_APP_ID, name=FB_APP_NAME, groups=groups['data'])
     else:
-        return
+        groups = request.form.getlist('group_select')
+        app.logger.debug("group_select: " + ','.join(groups))
+        message = request.form.get('group_text', '')
+        app.logger.debug("group_text: " + message)
+        for group in groups:
+            try:
+                graph.put_object(group, "feed", message=message)
+            except Exception as error:
+                app.logger.error(error.message)
+
+        return redirect(url_for('add_entry'))
 
 
 @app.route('/about')
 def about():
-    return render_template('about.html')
+    return render_template('about.html', app_id=FB_APP_ID, name=FB_APP_NAME)
 
 
 @app.before_request
