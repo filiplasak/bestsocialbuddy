@@ -33,13 +33,21 @@ def deploy():
     # touch the .wsgi file to trigger a reload in mod_wsgi
     run('touch %s/deploy/%s' % (BASE_FOLDER, WSGI_FILE))
 
+    # restart gunicorn
+    run('sudo /bin/systemctl restart bestsocialbuddy')
+
 
 def prodconfig():
     # upload configs
     put('%s' % PROD_CONFIG_FILE, '%s/deploy/%s' % (BASE_FOLDER, PROD_CONFIG_FILE))
     put('config/%s' % WSGI_FILE, '%s/deploy/%s' % (BASE_FOLDER, WSGI_FILE))
     put('config/bestsocialbuddy.service', '%s/deploy/bestsocialbuddy.service' % BASE_FOLDER)
+
+    # touch wsgi file - TODO: this should trigger restart of gunicorn/service
     run('touch %s/deploy/%s' % (BASE_FOLDER, WSGI_FILE))
+
+    # restart gunicorn
+    run('sudo /bin/systemctl restart bestsocialbuddy')
 
 
 def test():
