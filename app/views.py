@@ -46,7 +46,6 @@ def dashboard():
     except GraphAPIError as error:
         app.logger.error("Error: " + error.message)
         return redirect(url_for('logout'))
-    # groups = graph.get_connections(id='me', connection_name='groups')
     app.logger.debug('groups: ' + str(groups))
 
     return render_template('dashboard.html', user=g.user, app_id=FB_APP_ID, name=FB_APP_NAME, groups=groups['data'])
@@ -83,7 +82,7 @@ def add_entry():
 
 @app.route('/about')
 def about():
-    return render_template('about.html', app_id=FB_APP_ID, name=FB_APP_NAME)
+        return render_template('about.html', app_id=FB_APP_ID, name=FB_APP_NAME)
 
 
 @app.before_request
@@ -154,4 +153,4 @@ def load_user(user_id):
 
 @login_manager.unauthorized_handler
 def unauthorized():
-    return render_template('login.html')
+    return render_template('login.html', app_id=FB_APP_ID, name=FB_APP_NAME)
