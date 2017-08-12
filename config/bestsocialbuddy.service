@@ -1,0 +1,13 @@
+[Unit]
+Description=Gunicorn instance to serve bestsocialbuddy
+After=network.target
+
+[Service]
+User=bestsocialbuddy
+Group=bestsocialbuddy
+WorkingDirectory=/home/bestsocialbuddy/deploy
+Environment="PATH=/home/bestsocialbuddy/env/bin"
+ExecStart=/home/bestsocialbuddy/env/bin/gunicorn --workers 3 --bind localhost:8000 wsgi:app
+
+[Install]
+WantedBy=multi-user.target
