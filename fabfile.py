@@ -6,9 +6,13 @@ env.user = 'bestsocialbuddy'
 env.hosts = ['1.2.3.4']
 env.port = 70
 
-BASE_FOLDER='/home/bestsocialbuddy'
-PROD_CONFIG_FILE='config_prod.py'
-WSGI_FILE='wsgi.py'
+PROD_CONFIG_FILE = 'config_prod.py'
+PROD_BASE_FOLDER = '/home/bestsocialbuddy/deploy'
+
+BASE_CONFIG_FOLDER = 'config/app'
+BASE_ENV_FOLDER = 'config/env'
+
+WSGI_FILE = 'wsgi.py'
 
 
 def pack():
@@ -25,13 +29,13 @@ def deploy():
     put('dist/%s' % filename, '/tmp/%s' % filename)
 
     # install the package in the application's virtualenv with pip
-    run('%s/env/bin/pip install /tmp/%s' % (BASE_FOLDER, filename))
+    run('%s/env/bin/pip install /tmp/%s' % (PROD_BASE_FOLDER, filename))
 
     # remove the uploaded package
     run('rm -r /tmp/%s' % filename)
 
     # touch the .wsgi file to trigger a reload in mod_wsgi
-    run('touch %s/deploy/%s' % (BASE_FOLDER, WSGI_FILE))
+    run('touch %s/deploy/%s' % (PROD_BASE_FOLDER, WSGI_FILE))
 
     # restart gunicorn
     run('sudo /bin/systemctl restart bestsocialbuddy')
@@ -39,12 +43,12 @@ def deploy():
 
 def prodconfig():
     # upload configs
-    put('%s' % PROD_CONFIG_FILE, '%s/deploy/%s' % (BASE_FOLDER, PROD_CONFIG_FILE))
-    put('config/%s' % WSGI_FILE, '%s/deploy/%s' % (BASE_FOLDER, WSGI_FILE))
-    put('config/bestsocialbuddy.service', '%s/deploy/bestsocialbuddy.service' % BASE_FOLDER)
+    put('./%s/%s' % (BASE_CONFIG_FOLDER, PROD_CONFIG_FILE), '%s/%s' % (PROD_BASE_FOLDER, PROD_CONFIG_FILE))
+    put('./%s/%s' % (BASE_ENV_FOLDER, WSGI_FILE), '%s/%s' % (PROD_BASE_FOLDER, WSGI_FILE))
+    put('config/env/bestsocialbuddy.service', '%s/bestsocialbuddy.service' % PROD_BASE_FOLDER)
 
     # touch wsgi file - TODO: this should trigger restart of gunicorn/service
-    run('touch %s/deploy/%s' % (BASE_FOLDER, WSGI_FILE))
+    # run('touch %s/deploy/%s' % (PROD_BASE_FOLDER, WSGI_FILE))
 
     # restart gunicorn
     run('sudo /bin/systemctl restart bestsocialbuddy')

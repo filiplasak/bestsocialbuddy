@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='best-social-buddy',
-    version='1.0',
+    version='1.1.1',
     long_description=__doc__,
     packages=['app'],
     include_package_data=True,

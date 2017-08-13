@@ -1,4 +1,4 @@
-Best Social Companion
+Best Social Buddy
 ====
 
-Help you manage you FB groups.
+Help you manage your FB groups.
