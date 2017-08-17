@@ -7,7 +7,7 @@ env.hosts = ['1.2.3.4']
 env.port = 70
 
 PROD_CONFIG_FILE = 'config_prod.py'
-PROD_BASE_FOLDER = '/home/bestsocialbuddy/deploy'
+PROD_BASE_FOLDER = '/home/bestsocialbuddy'
 
 BASE_CONFIG_FOLDER = 'config/app'
 BASE_ENV_FOLDER = 'config/env'
@@ -43,9 +43,9 @@ def deploy():
 
 def prodconfig():
     # upload configs
-    put('./%s/%s' % (BASE_CONFIG_FOLDER, PROD_CONFIG_FILE), '%s/%s' % (PROD_BASE_FOLDER, PROD_CONFIG_FILE))
-    put('./%s/%s' % (BASE_ENV_FOLDER, WSGI_FILE), '%s/%s' % (PROD_BASE_FOLDER, WSGI_FILE))
-    put('config/env/bestsocialbuddy.service', '%s/bestsocialbuddy.service' % PROD_BASE_FOLDER)
+    put('%s/%s' % (BASE_CONFIG_FOLDER, PROD_CONFIG_FILE), '%s/deploy/%s' % (PROD_BASE_FOLDER, PROD_CONFIG_FILE))
+    put('%s/%s' % (BASE_ENV_FOLDER, WSGI_FILE), '%s/deploy/%s' % (PROD_BASE_FOLDER, WSGI_FILE))
+    put('config/env/bestsocialbuddy.service', '%s/deploy/bestsocialbuddy.service' % PROD_BASE_FOLDER)
 
     # touch wsgi file - TODO: this should trigger restart of gunicorn/service
     # run('touch %s/deploy/%s' % (PROD_BASE_FOLDER, WSGI_FILE))

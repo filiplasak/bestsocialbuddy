@@ -148,9 +148,11 @@ def get_current_user():
 
 @login_manager.user_loader
 def load_user(user_id):
+    app.logger.debug('user_loader')
     return User.query.get(user_id)
 
 
 @login_manager.unauthorized_handler
 def unauthorized():
+    app.logger.debug('unauthorized_handler')
     return render_template('login.html', app_id=FB_APP_ID, name=FB_APP_NAME)
