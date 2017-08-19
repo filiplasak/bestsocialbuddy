@@ -17,7 +17,7 @@ else:
     file_handler.setLevel(DEBUG)
     app.logger.addHandler(file_handler)
 
-print(app.config)
+app.logger.debug(app.config)
 db = SQLAlchemy(app)
 
 login_manager = LoginManager()

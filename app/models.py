@@ -5,7 +5,7 @@ from flask_login import UserMixin
 
 class User(db.Model, UserMixin):
 
-    id = db.Column(db.Integer, nullable=False, primary_key=True)
+    id = db.Column(db.BigInteger, nullable=False, primary_key=True)
     created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     updated = db.Column(db.DateTime, default=datetime.utcnow, nullable=False,
                         onupdate=datetime.utcnow)

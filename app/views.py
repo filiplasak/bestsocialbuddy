@@ -98,7 +98,7 @@ def get_current_user():
 
     # Set the user in the session dictionary as a global g.user and bail out
     # of this function early.
-    if session.get('user'):
+    if session.get('user', False):
         app.logger.debug('session.get(\'user\') returns true')
         g.user = session.get('user')
         return
