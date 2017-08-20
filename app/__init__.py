@@ -6,7 +6,7 @@ from flask.logging import getLogger, DEBUG
 
 app = Flask(__name__)
 app.config.from_object('app.default_config')
-app.config.from_envvar('FLASK_CONFIG_PATH', silent=False)
+app.config.from_envvar('FLASK_CONFIG_PATH', silent=True)
 
 if app.debug:
     log = getLogger('console')
