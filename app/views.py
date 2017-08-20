@@ -85,6 +85,11 @@ def about():
         return render_template('about.html', app_id=FB_APP_ID, name=FB_APP_NAME)
 
 
+@app.route('/privacy')
+def privacy():
+        return render_template('privacy.html', app_id=FB_APP_ID, name=FB_APP_NAME)
+
+
 @app.before_request
 def get_current_user():
     """Set g.user to the currently logged in user.
