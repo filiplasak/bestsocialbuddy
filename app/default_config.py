@@ -15,3 +15,6 @@ SQLALCHEMY_DATABASE_URI = db_uri
 FB_APP_ID = ''
 FB_APP_NAME = 'social-companion'
 FB_APP_SECRET = ''
+
+CACHE_TYPE = 'filesystem'
+CACHE_DIR = '/tmp'

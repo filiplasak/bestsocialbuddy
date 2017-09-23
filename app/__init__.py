@@ -1,7 +1,7 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
-
+from flask_cache import Cache
 from flask.logging import getLogger, DEBUG
 
 app = Flask(__name__)
@@ -18,6 +18,8 @@ else:
     app.logger.addHandler(file_handler)
 
 app.logger.debug(app.config)
+
+cache = Cache(app, config=app.config)
 db = SQLAlchemy(app)
 
 login_manager = LoginManager()

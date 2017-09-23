@@ -2,7 +2,7 @@ from facebook import get_user_from_cookie, GraphAPI, GraphAPIError
 from flask import g, render_template, redirect, request, session, url_for
 from flask_login import login_user, logout_user, login_required
 
-from app import app, db, login_manager
+from app import app, db, login_manager, cache
 from .models import User
 
 FB_APP_ID = app.config['FB_APP_ID']
@@ -35,38 +35,33 @@ def logout():
     return redirect(url_for('index'))
 
 
-@app.route('/dashboard')
-@login_required
-def dashboard():
-    """Dashboard
-    """
-    graph = GraphAPI(g.user['access_token'])
+@cache.memoize(timeout=360)
+def get_fb_groups(token):
+    graph = GraphAPI(token)
     try:
         groups = graph.get_object(id='me/groups', fields='name,id,members,feed')
     except GraphAPIError as error:
         app.logger.error("Error: " + error.message)
         return redirect(url_for('logout'))
     app.logger.debug('groups: ' + str(groups))
+    return groups['data']
 
-    return render_template('dashboard.html', user=g.user, app_id=FB_APP_ID, name=FB_APP_NAME, groups=groups['data'])
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    fb_groups = get_fb_groups(g.user['access_token'])
+    return render_template('dashboard.html', user=g.user, app_id=FB_APP_ID, name=FB_APP_NAME, groups=fb_groups)
 
 
 @app.route('/dashboard/add_entry', methods=['GET', 'POST'])
 @login_required
 def add_entry():
-    """Add entry
-    """
-    graph = GraphAPI(g.user['access_token'])
     if request.method == 'GET':
-        try:
-            groups = graph.get_object(id='me/groups', fields='name,id,members,feed')
-        except GraphAPIError as error:
-            app.logger.error("Error: " + error.message)
-            return redirect(url_for('logout'))
-        app.logger.debug('groups: ' + str(groups))
-
-        return render_template('add_entry.html', user=g.user, app_id=FB_APP_ID, name=FB_APP_NAME, groups=groups['data'])
+        fb_groups = get_fb_groups(g.user['access_token'])
+        return render_template('add_entry.html', user=g.user, app_id=FB_APP_ID, name=FB_APP_NAME, groups=fb_groups)
     else:
+        graph = GraphAPI(g.user['access_token'])
         groups = request.form.getlist('group_select')
         app.logger.debug("group_select: " + ','.join(groups))
         message = request.form.get('group_text', '')
@@ -76,18 +71,20 @@ def add_entry():
                 graph.put_object(group, "feed", message=message)
             except Exception as error:
                 app.logger.error(error.message)
+            else:
+                cache.delete_memoized(get_fb_groups, g.user['access_token'])
 
         return redirect(url_for('add_entry'))
 
 
 @app.route('/about')
 def about():
-        return render_template('about.html', app_id=FB_APP_ID, name=FB_APP_NAME)
+    return render_template('about.html', app_id=FB_APP_ID, name=FB_APP_NAME)
 
 
 @app.route('/privacy')
 def privacy():
-        return render_template('privacy.html', app_id=FB_APP_ID, name=FB_APP_NAME)
+    return render_template('privacy.html', app_id=FB_APP_ID, name=FB_APP_NAME)
 
 
 @app.before_request

@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='best-social-buddy',
-    version='1.1.5',
+    version='1.1.7',
     long_description=__doc__,
     packages=['app'],
     include_package_data=True,
@@ -14,6 +14,7 @@ setup(
         'Flask==0.12.1',
         'Flask-Login==0.4.0',
         'Flask-SQLAlchemy==2.2',
+        'Flask-Cache',
         'itsdangerous==0.24',
         'Jinja2==2.9.6',
         'MarkupSafe==1.0',
