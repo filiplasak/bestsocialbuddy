@@ -33,20 +33,22 @@ def logout():
     cache.delete_memoized(get_fb_groups, g.user['access_token'])
     session.pop('user', None)
     logout_user()
+    app.logger.debug('User logout')
     return redirect(url_for('index'))
 
 
 @cache.memoize(timeout=360)
 def get_fb_groups(token):
+    app.logger.debug('get_fb_groups')
     graph = GraphAPI(token)
     try:
         groups = graph.get_object(id='me/groups', fields='name,id,members,feed')
     except GraphAPIError as error:
         app.logger.error("GraphAPIError: " + error.message)
-        return redirect(url_for('logout'))
+        return None
     except Exception as error:
         app.logger.error("Exception: " + error.message)
-        return redirect(url_for('logout'))
+        return None
     app.logger.debug('groups: ' + str(groups))
     return groups['data']
 
@@ -55,6 +57,8 @@ def get_fb_groups(token):
 @login_required
 def dashboard():
     fb_groups = get_fb_groups(g.user['access_token'])
+    if fb_groups is None:
+        return redirect(url_for('logout'))
     return render_template('dashboard.html', user=g.user, app_id=FB_APP_ID, name=FB_APP_NAME, groups=fb_groups)
 
 
