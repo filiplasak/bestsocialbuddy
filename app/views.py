@@ -30,6 +30,7 @@ def logout():
     session.  Note: this does not log the user out of Facebook - this is done
     by the JavaScript SDK.
     """
+    cache.delete_memoized(get_fb_groups, g.user['access_token'])
     session.pop('user', None)
     logout_user()
     return redirect(url_for('index'))
@@ -41,7 +42,10 @@ def get_fb_groups(token):
     try:
         groups = graph.get_object(id='me/groups', fields='name,id,members,feed')
     except GraphAPIError as error:
-        app.logger.error("Error: " + error.message)
+        app.logger.error("GraphAPIError: " + error.message)
+        return redirect(url_for('logout'))
+    except Exception as error:
+        app.logger.error("Exception: " + error.message)
         return redirect(url_for('logout'))
     app.logger.debug('groups: ' + str(groups))
     return groups['data']
