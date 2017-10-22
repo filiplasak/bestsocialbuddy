@@ -1,0 +1,16 @@
+server {
+
+    listen 80;
+    server_name www.bestsocialbuddy.com bestsocialbuddy.com;
+
+    root /home/bestsocialbuddy/deploy;
+
+    location / {
+        proxy_pass http://localhost:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+    location /static {
+        alias /home/bestsocialbuddy/env/lib/python3.6/site-packages/app/static;
+    }
+}
